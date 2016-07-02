@@ -1,0 +1,102 @@
+#import "MyTableViewController.h"
+
+@interface MyTableViewController ()
+@property(strong,nonatomic) NSArray * tableData;
+@property(strong,nonatomic) NSArray * prepTime;
+@property(strong,nonatomic) NSArray *results;
+
+@end
+
+@implementation MyTableViewController
+
+
+
+
+
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    NSString *path=[[NSBundle mainBundle] pathForResource:@"recipes" ofType:@"plist"];
+    NSDictionary *dict=[[NSDictionary alloc]initWithContentsOfFile:path];
+    self.tableData=[dict objectForKey:@"RecipeName"];
+    self.prepTime=[dict objectForKey:@"PrepTime"];
+    
+}
+
+-(BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchString:(NSString *)searchString{
+    
+    [self filterContentForSearchText:searchString scope:[[self.searchDisplayController.searchBar scopeButtonTitles]objectAtIndex:[self.searchDisplayController.searchBar selectedScopeButtonIndex]]];
+    
+    return YES;
+    
+}
+
+-(void) filterContentForSearchText:(NSString *)searchText scope:(NSString *)scope{
+    
+    NSPredicate *resultPredicate=[NSPredicate predicateWithFormat:@"SELF contains[cd] %@",searchText];
+    self.results=[self.tableData filteredArrayUsingPredicate:resultPredicate];
+    NSLog(@"Count:%d",[self.results count]);
+    
+}
+
+- (void)didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+#pragma mark - Table view data source
+
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    return 71;
+}
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+
+    // Return the number of sections.
+    return 1;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    if (tableView==self.searchDisplayController.searchResultsTableView) {
+        return [self.results count];
+        
+    }
+    
+    else{
+        return [self.tableData count];
+        
+    }
+    
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    static NSString *simpleTableIdentifier = @"MyCell";
+    
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
+    
+    if (cell == nil) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier];
+    }
+    if (tableView == self.searchDisplayController.searchResultsTableView) {
+        cell.textLabel.text = [self.results objectAtIndex:indexPath.row];
+        
+    }
+    else {
+        cell.textLabel.text = [self.tableData objectAtIndex:indexPath.row];
+        cell.detailTextLabel.text=[self.prepTime objectAtIndex:indexPath.row];
+        
+        
+        
+    }
+
+    
+    // Configure the cell...
+    
+    return cell;
+}

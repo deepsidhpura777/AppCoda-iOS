@@ -1,0 +1,4 @@
+1.iCloud
+2.Camera
+3.Video
+4.PageViewController
